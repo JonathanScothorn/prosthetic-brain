@@ -2,26 +2,40 @@ package assignment1;
 
 public class BridgeNode {
 	
-	private int leftCannibals;
-	private int leftMissionaries;
-	private boolean boatIsLeft;
+	private boolean[] peopleLeft;
+	private boolean boatLeft;
 	
-	public BridgeNode(int c, int m, boolean boat){
-		leftCannibals = c;
-		leftMissionaries = m;
-		boatIsLeft = boat;
+	public BridgeNode(boolean[] people, boolean boatLeft){
+		peopleLeft = people;
+		this.setBoatLeft(boatLeft);
 	}
 	
-	public int getCannibals(){
-		return leftCannibals;
+	public void setPerson(int personNumber, boolean value){
+		peopleLeft[personNumber] = value;
 	}
 	
-	public int getMissionaries(){
-		return leftMissionaries;
+	public boolean[] getPeople(){
+		return peopleLeft;
+	}
+
+	public boolean getBoatLeft() {
+		return boatLeft;
 	}
 	
-	public boolean getBoat(){
-		return boatIsLeft;
+	public boolean getPerson(int index){
+		return peopleLeft[index]; //potential array out of bounds
+	}
+	
+	public void setPerson(int index){
+		peopleLeft[index] = !peopleLeft[index]; // array out of bounds potential
+	}
+
+	public void setBoatLeft(boolean boatLeft) {
+		this.boatLeft = boatLeft;
+	}
+	
+	public int getNumPeople(){
+		return peopleLeft.length;
 	}
 
 }
