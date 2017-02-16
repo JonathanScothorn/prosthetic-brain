@@ -6,17 +6,19 @@ public class BridgeNode {
 	private boolean[] peopleLeft;
 	private boolean torchLeft;
 	private int timeToReach;
+	private int totalCost;
 	
 	
-	public BridgeNode(boolean[] people, boolean torchLeft, int timeTaken){
-		this(people, torchLeft, null, timeTaken);
+	public BridgeNode(boolean[] people, boolean torchLeft, int timeTaken, int heuristic){
+		this(people, torchLeft, null, timeTaken, heuristic);
 	}
 	
-	public BridgeNode(boolean[] people, boolean torchLeft, BridgeNode parent, int timeTaken){
+	public BridgeNode(boolean[] people, boolean torchLeft, BridgeNode parent, int timeTaken, int heuristic){
 		peopleLeft = people;
 		this.setTorchLeft(torchLeft);
 		this.parent = parent;
 		timeToReach = timeTaken;
+		totalCost = timeToReach + heuristic;
 	}
 	
 	public void setPerson(int personNumber, boolean value){
@@ -51,8 +53,8 @@ public class BridgeNode {
 		return parent;
 	}
 	
-	public BridgeNode copy(){
-		return new BridgeNode(peopleLeft.clone(), torchLeft, this, timeToReach);
+	public BridgeNode createChild(){
+		return new BridgeNode(peopleLeft.clone(), torchLeft, this, timeToReach, totalCost);
 	}
 	
 	@Override
@@ -79,6 +81,14 @@ public class BridgeNode {
 
 	public void setTimeToReach(int timeToReach) {
 		this.timeToReach = timeToReach;
+	}
+
+	public int getTotalCost() {
+		return totalCost;
+	}
+
+	public void setTotalCost(int totalCost) {
+		this.totalCost = totalCost;
 	}
 
 }

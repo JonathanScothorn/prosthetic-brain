@@ -1,32 +1,30 @@
 package assignment1;
 
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 
-public class BridgeTree {
+public class SolutionTree {
 	
 	private int dataStructure;//0 for stack, 1 for queue, 2 for map
 	private Stack<BridgeNode> stack;
 	private LinkedList<BridgeNode> queue;
-	private HashMap<Integer,BridgeNode> map;
+	private TreeSet<BridgeNode> tree;
 	
-	public BridgeTree(int dataStructure){
+	public SolutionTree(int dataStructure){
 		
 		this.dataStructure = dataStructure;
 		
 		if(dataStructure == 0){
 			stack = new Stack<BridgeNode>();
 			queue = null;
-			map = null;
+			tree = null;
 		} else if(dataStructure == 1){
 			queue = new LinkedList<BridgeNode>();
 			stack = null;
-			map = null;
+			tree = null;
 		} else if(dataStructure == 2){
-			map = new HashMap();
+			tree = new TreeSet<BridgeNode>(new BridgeNodeComparator());
 			stack = null;
 			queue = null;
 		} else {
@@ -34,13 +32,13 @@ public class BridgeTree {
 		}
 	}
 	
-	public void addNode(BridgeNode n, int heuristic){
+	public void addNode(BridgeNode n){
 		if(dataStructure==0){
 			stack.push(n);
 		} else if(dataStructure==1){
 			queue.add(n);
 		} else {
-			map.put(new Integer(heuristic), n);
+			tree.add(n);
 		}
 	}
 	
@@ -52,11 +50,7 @@ public class BridgeTree {
 		} else if(dataStructure==1){
 			return queue.removeFirst();
 		} else {
-			//sort the keyset as a treeset and return the node with the lowest key
-			TreeSet<Integer> keys = new TreeSet<Integer>(map.keySet()); 
-			BridgeNode output = map.get(keys.first());
-			map.remove(keys.first());
-			return output;
+			return tree.pollFirst();
 		}
 	}
 	
@@ -66,9 +60,7 @@ public class BridgeTree {
 		} else if(dataStructure==1){
 			return queue.peek();
 		} else {
-			//sort the keyset as a treeset and return the node with the lowest key
-			TreeSet<Integer> keys = new TreeSet<Integer>(map.keySet()); 
-			return map.get(keys.first());
+			return tree.first();
 		}
 	}
 	
@@ -82,7 +74,7 @@ public class BridgeTree {
 				return false;
 			}
 		} else {
-			if(map.size()==0){
+			if(tree.size()==0){
 				return true;
 			} else {
 				return false;
@@ -106,8 +98,7 @@ public class BridgeTree {
 				output+="-";
 			}
 		} else {
-			//don't really care about the order
-			for(BridgeNode n: map.values()){
+			for(BridgeNode n: tree){
 				output+=n.toString();
 				output+="-";
 			}
