@@ -71,20 +71,20 @@ public class Bridge {
 		
 	}
 	
-	private void initializeP2(SolutionTree openTree, int[][]boardState){
+	private void initializeP2(SolutionTree openTree, int[][]boardState, int[][]goalState){
 		
 		//create the starting node
 		BoardNode initial = new BoardNode(boardState, 0, 0);
 		openTree.addNode(initial);
 		
 		//create goal node and solve.  Note that if the board is larger than 3x3 there will be empty spaces. Would need a fancy recursive spiral solution to fill a board of any arbitrary dimensions.	
-		int[][] goal = new int[boardState.length][boardState[0].length];
+		//int[][] goal = new int[boardState.length][boardState[0].length];
 		
 		/* fill first row with sequence
 		|1|2|3|
 		| | | |
 		| | | |		
-		*/
+		
 		int currentInt = 1;
 		int maxInt = boardState.length*boardState[0].length - 1;
 		for(int x=0; x<boardState[0].length; x++){
@@ -95,7 +95,7 @@ public class Bridge {
 		|1|2|3|
 		| | |4|
 		| | |5|		
-		*/
+		
 		for(int y=1; y<boardState.length; y++){
 			goal[y][boardState[0].length-1] = currentInt;
 			currentInt++;
@@ -105,7 +105,7 @@ public class Bridge {
 		|1|2|3|
 		| | |4|
 		|7|6|5|		
-		*/
+		
 		for(int x=boardState[0].length-2; x>=0; x--){
 			if(currentInt <= maxInt){	
 				goal[boardState.length-1][x] = currentInt;
@@ -120,7 +120,7 @@ public class Bridge {
 		|1|2|3|
 		|8| |4|
 		|7|6|5|		
-		*/
+		
 		if(currentInt<=maxInt){
 			for(int y=boardState.length-2; y>0; y--){
 				if(currentInt <= maxInt){	
@@ -138,7 +138,9 @@ public class Bridge {
 			goal[1][1]=0;
 		}
 		
-		BoardNode goalNode = new BoardNode(goal, 0, 0);
+		BoardNode goalNode = new BoardNode(goal, 0, 0);*/
+		BoardNode goalNode = new BoardNode(goalState, 0, 0);
+		
 		System.out.println("Goal node: \n"+goalNode.toString());
 		setTargetNode(goalNode);
 		solve(openTree, goalNode);
@@ -264,22 +266,9 @@ public class Bridge {
 			System.out.println("Expanding node: "+lastNode.toString());
 		
 		// generate legal moves
-		//first need to find the location of the "blank" tile (0)
-		int x0=0;
-		int y0=0;
 		int maxX = lastNode.getBoard()[0].length-1;//maximum index value, which is array length-1
 		int maxY = lastNode.getBoard().length-1;
 		
-		outerloop:
-		for(int y=0; y<=maxY; y++){
-			for(int x=0; x<=maxX; x++){
-				if(lastNode.getTile(x, y)==0){
-					x0=x;
-					y0=y;
-					break outerloop;//don't waste time examining other locations if the 0 coordinates have been found
-				}
-			}
-		}
 		
 		// add all possible non-blank tile "horse" moves
 		//test each non-blank tile
@@ -313,18 +302,42 @@ public class Bridge {
 		}
 		
 		
-		
-		// add all possible blank tile moves
-		for(int i=-1; i<=1; i++){
-			for(int j=-1; j<=1; j++){
-				if(!(i==0 && j==0)){//0,0 would be a null move
-					//only accept moves that keep the blank tile within the board area
-					if(x0+i>=0 && x0+i<=maxX && y0+j>=0 && y0+j<=maxY){
-						legalMoves.add(new BoardMove(x0,y0,x0+i,y0+j));
-					}
+		//first need to find the location of the "blank" tile (0)
+		ArrayList<Integer> xVals = new ArrayList<Integer>();//
+		ArrayList<Integer> yVals = new ArrayList<Integer>();//
+		//int x0=0;
+		//int y0=0;
+				
+
+		outerloop:
+		for(int y=0; y<=maxY; y++){
+			for(int x=0; x<=maxX; x++){
+				if(lastNode.getTile(x, y)==0){
+					//x0=x;
+					//y0=y;
+					//break outerloop;//don't waste time examining other locations if the 0 coordinates have been found
+					xVals.add(x);//
+					yVals.add(y);//
 				}
 			}
 		}
+		
+		// add all possible blank tile moves
+		for(int x0:xVals){//
+			for(int i=-1; i<=1; i++){
+				for(int j=-1; j<=1; j++){
+					if(!(i==0 && j==0)){//0,0 would be a null move
+						//only accept moves that keep the blank tile within the board area
+						int y0 = yVals.get(xVals.indexOf(x0));//
+						if(x0+i>=0 && x0+i<=maxX && y0+j>=0 && y0+j<=maxY){
+							legalMoves.add(new BoardMove(x0,y0,x0+i,y0+j));
+						}
+					}
+				}
+			}
+		}//
+		
+		
 		
 		if(!suppressPrinting)
 			System.out.println("moves: "+Arrays.toString(legalMoves.toArray()));
@@ -401,12 +414,12 @@ public class Bridge {
 		
 		for(int i=0; i<node.getBoard()[0].length; i++){
 			for(int j=0;j<node.getBoard().length; j++){
-				if(node.getTile(i,j) != getTargetNode().getTile(i,j)){
+				if(node.getTile(i,j) != getTargetNode().getTile(i,j) && node.getTile(i, j) != 0){
 					heuristic++;
 				}
 			}
 		}
-		heuristic--;//to account for the blank tile, which is not counted as misplaced
+		
 		
 		return heuristic;
 	}
@@ -551,10 +564,8 @@ public class Bridge {
 			b.setProblem1(false);
 			
 			boolean intFound = false;
-			boolean fileFound = false;
 			int width = 1;
 			int height = 1;
-			String filename = "";
 			
 			System.out.println("Now performing problem 2.");
 			
@@ -590,87 +601,47 @@ public class Bridge {
 				}
 			}
 			
+			System.out.println("Initial State Input: ");
+			int[][] inputArray = new int[height][width];
+			inputArray = b.readFile(inputArray, scanner);
 			
-			while(!fileFound){
-				try {
-					System.out.println("Please enter the full file path to a .CSV file to import, or 'q' to quit.");
-					filename = scanner.next();
-					if(filename.equals("q")){
-						break;
-					}
-						
-					System.out.println("Opening "+filename);
-					
-					scanner = new Scanner(new File(filename));
-					fileFound = true;
-					
-				} catch(FileNotFoundException e){
-					System.out.println("File not found.  Please try again.");
-					//scanner = new Scanner(System.in);
-				}
+			System.out.println("Goal State Input: ");
+			int[][] goalArray = new int[height][width];
+			goalArray = b.readFile(goalArray, scanner);
+			
+			
+			scanner = new Scanner(System.in);
+			
+			System.out.println("Please enter 'b' for BFS, 'd' for DFS, 'a' for A* heuristic 1, 'c' for A* heuristic 2, or 'e' for A* using the average of the heuristics.  \n"
+				+ "Anything else quits.");
+			userInput = scanner.next();
+			if(userInput.equals("b")){
+				System.out.println("Solving using BFS");
+				b.initializeP2(new SolutionTree(1), inputArray, goalArray);;
+			} else if(userInput.equals("d")) {
+				System.out.println("Solving using DFS");
+				b.initializeP2(new SolutionTree(0), inputArray, goalArray);;
+			} else if(userInput.equals("a")){
+				System.out.println("Solving using A* search, heuristic 1.");
+				b.setHeuristicAlgorithm(4);
+				b.initializeP2(new SolutionTree(2), inputArray, goalArray);
+			} else if(userInput.equals("c")){
+				System.out.println("Solving using A* search, heuristic 2.");
+				b.setHeuristicAlgorithm(5);
+				b.initializeP2(new SolutionTree(2), inputArray, goalArray);
+			} else if(userInput.equals("e")){
+				System.out.println("Solving using A* search, heuristic average.");
+				b.setHeuristicAlgorithm(6);
+				b.initializeP2(new SolutionTree(2), inputArray, goalArray);
+			} else {
+				System.out.println("Terminating.");
 			}
-			
-			if(!filename.equals("q")){
-				scanner.useDelimiter(",");
-				int[][] inputArray = new int[height][width];
-				int maxEntries = height*width;
-				int entries = 0;
-				int x = 0;
-				int y = 0;
-				while(scanner.hasNext() && entries < maxEntries){
-					entries++;
-					String csvValue = scanner.next();
-					String trimmed = csvValue.trim();
-					int value = Integer.parseInt(trimmed);
-					System.out.println(value);
-					if(x<width){
-						inputArray[y][x] = value;
-						x++;
-					} else {
-						x=0;
-						y++;
-						inputArray[y][x] = value;
-						x++;
-					}
-				}
-				scanner = new Scanner(System.in);
-				
-				System.out.println("Please enter 'b' for BFS, 'd' for DFS, 'a' for A* heuristic 1, 'c' for A* heuristic 2, or 'e' for A* using the average of the heuristics.  \n"
-					+ "Anything else quits.");
-				userInput = scanner.next();
-				if(userInput.equals("b")){
-					System.out.println("Solving using BFS");
-					b.initializeP2(new SolutionTree(1), inputArray);;
-				} else if(userInput.equals("d")) {
-					System.out.println("Solving using DFS");
-					b.initializeP2(new SolutionTree(0), inputArray);;
-				} else if(userInput.equals("a")){
-					System.out.println("Solving using A* search, heuristic 1.");
-					b.setHeuristicAlgorithm(4);
-					b.initializeP2(new SolutionTree(2), inputArray);
-				} else if(userInput.equals("c")){
-					System.out.println("Solving using A* search, heuristic 2.");
-					b.setHeuristicAlgorithm(5);
-					b.initializeP2(new SolutionTree(2), inputArray);
-				} else if(userInput.equals("e")){
-					System.out.println("Solving using A* search, heuristic average.");
-					b.setHeuristicAlgorithm(6);
-					b.initializeP2(new SolutionTree(2), inputArray);
-				} else {
-					System.out.println("Terminating.");
-				}
-				scanner.close();
-				
-				
-			}
-			
-			
-			scanner.close();
-			
-		} else {
-			System.out.println("Unrecognized input.  Please restart.");
 			scanner.close();
 		}
+				
+				
+			
+		
 		
 	}
 
@@ -688,6 +659,59 @@ public class Bridge {
 
 	public void setTargetNode(BoardNode targetNode) {
 		this.targetNode = targetNode;
+	}
+	
+	public int[][] readFile(int[][] inputArray, Scanner scanner){
+		
+		boolean fileFound = false;
+		String filename = "";
+		
+		while(!fileFound){
+			try {
+				System.out.println("Please enter the full file path to a .CSV file to import, or 'q' to quit.");
+				filename = scanner.next();
+				if(filename.equals("q")){
+					break;
+				}
+					
+				System.out.println("Opening "+filename);
+				
+				scanner = new Scanner(new File(filename));
+				fileFound = true;
+				
+			} catch(FileNotFoundException e){
+				System.out.println("File not found.  Please try again.");
+				//scanner = new Scanner(System.in);
+			}
+		}
+		
+		if(!filename.equals("q")){
+			scanner.useDelimiter(",");
+			int maxEntries = inputArray.length*inputArray[0].length;
+			int entries = 0;
+			int x = 0;
+			int y = 0;
+			while(scanner.hasNext() && entries < maxEntries){
+				entries++;
+				String csvValue = scanner.next();
+				String trimmed = csvValue.trim();
+				int value = Integer.parseInt(trimmed);
+				System.out.println(value);
+				if(x<inputArray[0].length){
+					inputArray[y][x] = value;
+					x++;
+				} else {
+					x=0;
+					y++;
+					inputArray[y][x] = value;
+					x++;
+				}
+			}
+		} else {
+			System.out.println("Unrecognized input.  Please restart.");
+		}
+		
+		return inputArray;
 	}
 
 }
