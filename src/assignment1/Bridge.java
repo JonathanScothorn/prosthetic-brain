@@ -189,14 +189,14 @@ public class Bridge {
 			System.out.println("Time taken to reach this solution was: "+currentNode.getTimeToReach()+" time units.");
 			System.out.println(nodesExpanded+" nodes were expanded to reach this solution.");
 			
-			String solution = "Final node-";
+			String solution = "Final node\n";
 			
 			while(currentNode.getParent() != null){
 				solution+=currentNode.toString();
-				solution+="-";
+				solution+="\n";
 				currentNode = currentNode.getParent();
 			}
-			solution+=currentNode.toString()+"-Initial node";
+			solution+=currentNode.toString()+"\nInitial node";
 			
 			System.out.println(solution);
 			
