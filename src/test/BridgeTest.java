@@ -34,9 +34,32 @@ public class BridgeTest {
 	}
 	
 	@Test
-	public void compareBridgeNode(){
+	public void compare(){
 		
-		//assertEquals(true, bridge.compareBridgeNode(new BridgeNode(new boolean[]{true, true}, true), new BridgeNode(new boolean[]{true, true}, true)));
+		int value = 0;
+		int[][] array = new int[3][3];
+		for(int i=0;i<3;i++){
+			for(int j=0;j<3;j++){
+				array[i][j]=value;
+				value++;
+			}
+		}
+		
+		value = 0;
+		int[][] array2 = new int[3][3];
+		for(int i=0;i<3;i++){
+			for(int j=0;j<3;j++){
+				array2[i][j]=value;
+				value++;
+			}
+		}
+		
+		BoardNode n1 = new BoardNode(array,0,0);
+		BoardNode n2 = new BoardNode(array2,0,0);
+		
+		System.out.println(n1.compare(n2));
+		System.out.println(n1.toString());
+		System.out.println(n2.toString());
 		
 	}
 	

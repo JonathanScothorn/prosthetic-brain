@@ -1,6 +1,8 @@
 package assignment1;
 
-public class BridgeNode {
+import java.util.Arrays;
+
+public class BridgeNode extends Node{
 	
 	private BridgeNode parent;
 	private boolean[] peopleLeft;
@@ -89,6 +91,19 @@ public class BridgeNode {
 
 	public void setTotalCost(int totalCost) {
 		this.totalCost = totalCost;
+	}
+	
+	public boolean compare(Node n){
+		if(n.getClass().equals(this.getClass())){
+			BridgeNode node = (BridgeNode) n;
+			if(Arrays.equals(getPeople(), node.getPeople()) && getTorchLeft() == node.getTorchLeft()){
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 
 }

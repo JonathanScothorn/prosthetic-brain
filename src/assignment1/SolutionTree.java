@@ -7,24 +7,24 @@ import java.util.TreeSet;
 public class SolutionTree {
 	
 	private int dataStructure;//0 for stack, 1 for queue, 2 for map
-	private Stack<BridgeNode> stack;
-	private LinkedList<BridgeNode> queue;
-	private TreeSet<BridgeNode> tree;
+	private Stack<Node> stack;
+	private LinkedList<Node> queue;
+	private TreeSet<Node> tree;
 	
 	public SolutionTree(int dataStructure){
 		
 		this.dataStructure = dataStructure;
 		
 		if(dataStructure == 0){
-			stack = new Stack<BridgeNode>();
+			stack = new Stack<Node>();
 			queue = null;
 			tree = null;
 		} else if(dataStructure == 1){
-			queue = new LinkedList<BridgeNode>();
+			queue = new LinkedList<Node>();
 			stack = null;
 			tree = null;
 		} else if(dataStructure == 2){
-			tree = new TreeSet<BridgeNode>(new BridgeNodeComparator());
+			tree = new TreeSet<Node>(new NodeComparator());
 			stack = null;
 			queue = null;
 		} else {
@@ -32,7 +32,7 @@ public class SolutionTree {
 		}
 	}
 	
-	public void addNode(BridgeNode n){
+	public void addNode(Node n){
 		if(dataStructure==0){
 			stack.push(n);
 		} else if(dataStructure==1){
@@ -44,7 +44,7 @@ public class SolutionTree {
 	
 	
 	
-	public BridgeNode getNode(){
+	public Node getNode(){
 		if(dataStructure==0){
 			return stack.pop();
 		} else if(dataStructure==1){
@@ -54,7 +54,7 @@ public class SolutionTree {
 		}
 	}
 	
-	public BridgeNode showNode(){
+	public Node showNode(){
 		if(dataStructure==0){
 			return stack.peek();
 		} else if(dataStructure==1){
@@ -86,19 +86,19 @@ public class SolutionTree {
 	public String toString(){
 		String output = "";
 		if(dataStructure==0){
-			Stack<BridgeNode> temp = (Stack<BridgeNode>)stack.clone();
+			Stack<Node> temp = (Stack<Node>)stack.clone();
 			while(!temp.empty()){
 				output+=temp.pop().toString();
 				output+="-";
 			}
 		} else if(dataStructure==1){
-			LinkedList<BridgeNode> temp = (LinkedList<BridgeNode>)queue.clone();
+			LinkedList<Node> temp = (LinkedList<Node>)queue.clone();
 			while(temp.size()!=0){
 				output+=temp.removeFirst().toString();
 				output+="-";
 			}
 		} else {
-			for(BridgeNode n: tree){
+			for(Node n: tree){
 				output+=n.toString();
 				output+="-";
 			}
