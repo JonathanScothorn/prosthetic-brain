@@ -4,13 +4,14 @@ import java.util.ArrayList;
 
 public class Square {
 	
+	// array contents should be a single -1 for out of bounds, a single 0 for empty, or some combination of 1s, 2s, etc. to represent each player's pieces
 	private ArrayList<Integer> pieces;
 	
+	// initialize square with only one entry
 	public Square(int contents){
 		pieces = new ArrayList<Integer>();
-		if(contents > 0){
-			addPiece(contents);
-		}
+		//System.out.println(contents);
+		addPiece(contents);
 	}
 	
 	public void addPiece(int piece){
@@ -30,7 +31,7 @@ public class Square {
 		String output = "";
 		for(int piece: pieces){
 			output+=piece;
-			output+="-";
+			//output+="-";
 		}
 		return output;
 	}
