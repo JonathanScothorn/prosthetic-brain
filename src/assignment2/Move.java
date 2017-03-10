@@ -55,5 +55,17 @@ public class Move {
 	public void setTokensToMove(int tokensToMove) {
 		this.tokensToMove = tokensToMove;
 	}
+	
+	public boolean equals(Move m){
+		if(m.getInitialX() == initialX && m.getInitialY() == initialY && m.getFinalX() == finalX && m.getFinalY() == finalY && m.getTokensToMove() == tokensToMove){
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public String toString(){
+		return "Move: "+initialX+","+initialY+" to "+finalX+","+finalY+" with "+tokensToMove+" tokens moved.";
+	}
 
 }
