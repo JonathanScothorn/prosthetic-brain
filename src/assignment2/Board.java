@@ -153,6 +153,14 @@ public class Board {
 		return grid;
 	}
 	
+	// only care about the square contents, so naively comparing the string outputs is sufficient here
+	public boolean equals(Board b){
+		if(b.toString().equals(toString())){
+			return true;
+		}
+		return false;
+	}
+	
 	
 	@Override
 	public String toString(){

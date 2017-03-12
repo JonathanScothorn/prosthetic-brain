@@ -195,7 +195,23 @@ public class Assignment2Test {
 	}
 	
 	@Test
-	public void gameGenerateMovoes() throws Exception{
+	public void gameCalculateHeuristic1() throws Exception{
+		
+		game.performMove(board, new Move(1,1,1,2,1));
+		assertEquals(19, game.calculateHeuristic1(board, board.getSquare(1, 2).getController()));
+		
+	}
+	
+	@Test
+	public void gameEvaluateNode() throws Exception{
+		
+		game.performMove(board, new Move(1,1,1,2,1));
+		
+		
+	}
+	
+	@Test
+	public void gameGenerateMoves() throws Exception{
 		// TODO
 	}
 	
