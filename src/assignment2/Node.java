@@ -9,20 +9,18 @@ public class Node {
 	private Node parent;
 	private int alphaOrBeta;
 	private boolean isMaxNode; // false indicates a min node
-	private ArrayList<Move> moveList;
 	private int playerNumber;
 	private Move bestNextMove;
 	private Move createdFrom;
 	
-	public Node(Board board, ArrayList<Move> moveList, boolean isMaxNode, int playerNumber){
+	public Node(Board board, boolean isMaxNode, int playerNumber){
 		
-		this(board, moveList, isMaxNode, null, null, playerNumber);
+		this(board, isMaxNode, null, null, playerNumber);
 	}
 	
-	public Node(Board board, ArrayList<Move> moveList, boolean isMaxNode, Node parent, Move createdFrom, int playerNumber){
+	public Node(Board board, boolean isMaxNode, Node parent, Move createdFrom, int playerNumber){
 		
 		this.setBoardState(board);
-		this.setMoveList(moveList);
 		this.setParent(parent);
 		this.createdFrom = createdFrom;
 		this.setIsMaxNode(isMaxNode);
@@ -42,14 +40,6 @@ public class Node {
 
 	public void setBoardState(Board boardState) {
 		this.boardState = boardState;
-	}
-
-	public ArrayList<Move> getMoveList() {
-		return moveList;
-	}
-
-	public void setMoveList(ArrayList<Move> moveList) {
-		this.moveList = moveList;
 	}
 
 	public int getPlayerNumber() {
@@ -90,6 +80,10 @@ public class Node {
 
 	public void setBestNextMove(Move bestNextMove) {
 		this.bestNextMove = bestNextMove;
+	}
+	
+	public Move getCreatedFrom(){
+		return createdFrom;
 	}
 	
 	@Override

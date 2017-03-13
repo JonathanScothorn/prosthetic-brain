@@ -41,6 +41,7 @@ public class Square {
 		int piecesCaptured = 0;
 		
 		while(pieces.size() > 5){
+			//System.out.println("Pieces remaining "+pieces.size());
 			pieces.remove(0);
 			piecesCaptured++;
 		}
@@ -68,7 +69,7 @@ public class Square {
 			
 			return removed;
 		} else {
-			System.out.println("Error: too many pieces were to be removed.");
+			System.out.println("Error: too many pieces ("+piecesToRemove+") were to be removed.  Square had "+getSize()+" pieces.");
 			return null;
 		}
 	}
@@ -105,6 +106,17 @@ public class Square {
 		}
 		
 		return true;
+	}
+	
+	public int getPiecesByPlayer(int playerToken){
+		int output = 0;
+		for(int piece: pieces){
+			if(piece == playerToken){
+				output++;
+			}
+		}
+		return output;
+		
 	}
 	
 	@Override
