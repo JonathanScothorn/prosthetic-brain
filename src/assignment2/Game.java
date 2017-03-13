@@ -41,6 +41,30 @@ public class Game {
 		
 	}
 	
+	public void printScores(){
+		
+		System.out.println("Player 1 has captured "+playerScores[0]+" pieces.");
+		System.out.println("Player 2 has captured "+playerScores[1]+" pieces.");
+	}
+	
+	public void calculateScores(){
+		
+		int p1TokensFound = 0;
+		int p2TokensFound = 0;
+		
+		for(int y=0; y<gameBoard.BOARD_HEIGHT; y++){
+			for(int x=0; x<gameBoard.BOARD_WIDTH; x++){
+				if(gameBoard.isValidCoord(x, y)){
+					p1TokensFound += gameBoard.getSquare(x, y).getPiecesByPlayer(1);
+					p2TokensFound += gameBoard.getSquare(x, y).getPiecesByPlayer(2);
+				}
+			}
+				
+		}
+		playerScores[0] = 18 - p2TokensFound;// player 1's score: the number of player 2 tokens that have been removed
+		playerScores[1] = 18 - p1TokensFound;// player 2's score
+	}
+	
 	public void runPvP(Scanner scanner, int players){
 		
 		// initialize both move tracking arrays to moves that are impossible.  These will be overwritten in the first 2 turns of the game.
@@ -58,10 +82,12 @@ public class Game {
 			gameInProgress = executeHumanTurn(scanner, currentPlayer);
 			
 			System.out.println(gameBoard.toString());
+			printScores();
 			
 			if(!gameInProgress){
 				System.out.println("Game complete.  Player "+currentPlayer+" is victorious!");
 			}
+			
 			
 			// increment the player number, and roll over if the maximum number of players has been exceeded
 			currentPlayer++;
@@ -93,10 +119,12 @@ public class Game {
 			}
 			
 			System.out.println(gameBoard.toString());
+			printScores();
 			
 			if(!gameInProgress){
 				System.out.println("Game complete.  Player "+currentPlayer+" is victorious!");
 			}
+			
 			
 			// increment the player number, and roll over if the maximum number of players has been exceeded
 			currentPlayer++;
@@ -126,10 +154,12 @@ public class Game {
 			}
 						
 			System.out.println(gameBoard.toString());
+			printScores();
 			
 			if(!gameInProgress){
 				System.out.println("Game complete.  Player "+currentPlayer+" is victorious!");
 			}
+			
 			
 			// increment the player number, and roll over if the maximum number of players has been exceeded
 			currentPlayer++;
@@ -156,10 +186,15 @@ public class Game {
 		secondLastMove[currentPlayerToken - 1] = lastMove[currentPlayerToken - 1];
 		lastMove[currentPlayerToken - 1] = initial.getBestNextMove();
 		logger.println("Executing move "+initial.getBestNextMove().toString());
-		playerScores[currentPlayerToken - 1] += performMove(gameBoard, initial.getBestNextMove());
+		//playerScores[currentPlayerToken - 1] += performMove(gameBoard, initial.getBestNextMove());
+		performMove(gameBoard, initial.getBestNextMove());
+		calculateScores();
 		
-		System.out.println("Computer player "+currentPlayerToken+" performs move "+initial.getBestNextMove().toString()+" with heuristic value "+initial.getAlphaOrBeta());
+		System.out.println("Computer player "+currentPlayerToken+" performs "+initial.getBestNextMove().toString()+" With heuristic value "+initial.getAlphaOrBeta());
 		
+		if(playerScores[currentPlayerToken - 1] >= 8 || playerScores[getNextPlayerToken(currentPlayerToken) - 1] >= 8){
+			return false;
+		}
 		return true;
 		
 	}
@@ -303,7 +338,14 @@ public class Game {
 		
 		secondLastMove[currentPlayerToken - 1] = lastMove[currentPlayerToken - 1];
 		lastMove[currentPlayerToken - 1] = move;
-		playerScores[currentPlayerToken-1] += performMove(gameBoard, move);
+		//playerScores[currentPlayerToken-1] += performMove(gameBoard, move);
+		performMove(gameBoard, move);
+		
+		calculateScores();
+		
+		if(playerScores[currentPlayerToken - 1] >= 8 || playerScores[getNextPlayerToken(currentPlayerToken) - 1] >= 8){
+			return false;
+		}
 		
 		return true;
 	}
@@ -452,6 +494,7 @@ public class Game {
 		return resultingStates;
 	}
 	
+	// returns the number of captured pieces
 	public int performMove(Board boardState, Move move){
 		// remove pieces from the first square
 		//System.out.println("Evaluating move "+move.toString());
@@ -475,7 +518,7 @@ public class Game {
 		
 	}
 	
-	// heuristic 1: count the total number of "controlled" pieces, give 5 bonus points per enemy token removed
+	// heuristic 1: count the total number of "controlled" pieces, give 50 bonus points per enemy token removed
 	public int calculateHeuristic1(Board board, int currentPlayerToken){
 		
 		int heuristicValue = 0;
@@ -495,7 +538,7 @@ public class Game {
 			}
 				
 		}
-		heuristicValue += ((18 - opposingPlayerTokensFound) * 5);
+		heuristicValue += ((18 - opposingPlayerTokensFound) * 50);
 		return heuristicValue;
 	}
 	
@@ -517,7 +560,7 @@ public class Game {
 			}
 				
 		}
-		heuristicValue += ((18 - opposingPlayerTokensFound) * 5);
+		heuristicValue += ((18 - opposingPlayerTokensFound) * 50);
 		return heuristicValue;
 		
 	}
@@ -526,6 +569,8 @@ public class Game {
 	public int calculateHeuristic3(Board board, int currentPlayerToken){
 		
 		int heuristicValue = 0;
+		int opposingPlayerTokensFound = 0;
+		int nextPlayerToken = getNextPlayerToken(currentPlayerToken);
 		
 		for(int y=0; y<board.BOARD_HEIGHT; y++){
 			for(int x=0; x<board.BOARD_WIDTH; x++){
@@ -535,10 +580,12 @@ public class Game {
 					} else {
 						heuristicValue -= board.getSquare(x, y).getSize();
 					}
+					opposingPlayerTokensFound += board.getSquare(x, y).getPiecesByPlayer(nextPlayerToken);
 				}
 			}
 				
 		}
+		heuristicValue += ((18 - opposingPlayerTokensFound) * 50);
 		return heuristicValue;
 	}
 	

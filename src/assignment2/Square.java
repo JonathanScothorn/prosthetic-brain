@@ -28,8 +28,7 @@ public class Square {
 		pieces.add(piece);
 	}
 	
-	/////////////////////////////////////// make sure that they are added in the right order!
-	// pieces are added, and some may be captured
+	// pieces are added, and some may be captured.  Returns the number of captured pieces.
 	public int addPieces(ArrayList<Integer> newPieces){
 		pieces.addAll(newPieces);
 		return capturePieces();
@@ -42,8 +41,12 @@ public class Square {
 		
 		while(pieces.size() > 5){
 			//System.out.println("Pieces remaining "+pieces.size());
+			// if the removed piece is not the same as the controlling player, it must belong to the opposing player, so give points to the controller for it
+			if(pieces.get(0) != getController()){
+				piecesCaptured++;
+			}
 			pieces.remove(0);
-			piecesCaptured++;
+			
 		}
 		return piecesCaptured;
 	}
