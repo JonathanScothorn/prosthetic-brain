@@ -7,13 +7,20 @@ public class Move {
 	private int finalX;
 	private int finalY;
 	private int tokensToMove;
+	private int generationIndex;
+	
 	
 	public Move(int x1, int y1, int x2, int y2, int tokens){
+		this(x1,y1,x2,y2,tokens,0);
+	}
+	
+	public Move(int x1, int y1, int x2, int y2, int tokens, int generationIndex){
 		setInitialX(x1);
 		setInitialY(y1);
 		setFinalX(x2);
 		setFinalY(y2);
 		setTokensToMove(tokens);
+		setGenerationIndex(generationIndex);
 	}
 
 	public int getInitialX() {
@@ -66,6 +73,14 @@ public class Move {
 	@Override
 	public String toString(){
 		return "Move: "+initialX+","+initialY+" to "+finalX+","+finalY+" with "+tokensToMove+" tokens moved.";
+	}
+
+	public int getGenerationIndex() {
+		return generationIndex;
+	}
+
+	public void setGenerationIndex(int generationIndex) {
+		this.generationIndex = generationIndex;
 	}
 
 }

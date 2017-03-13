@@ -30,16 +30,20 @@ public class Game {
 		
 	}
 	
-	public void runPvP(Scanner scanner, int players){
-		
-		// initialize both move tracking arrays to moves that are impossible.  These will be overwritten in the first 2 turns of the game.
+	public void initializeSavedMoves(int players){
 		secondLastMove = new Move[players];
 		lastMove = new Move[players];
 		for(int i=0; i<secondLastMove.length; i++){
-			secondLastMove[i] = new Move(0,0,0,0,0);
-			lastMove[i] = new Move(0,0,0,0,0);
+			secondLastMove[i] = new Move(0,0,0,0,0,0);
+			lastMove[i] = new Move(0,0,0,0,0,0);
 		}
-				
+		
+	}
+	
+	public void runPvP(Scanner scanner, int players){
+		
+		// initialize both move tracking arrays to moves that are impossible.  These will be overwritten in the first 2 turns of the game.
+		initializeSavedMoves(players);	
 		
 		boolean gameInProgress = true;
 		playerScores = new int[players]; // defaults to zero filled
@@ -72,12 +76,7 @@ public class Game {
 	public void runPvC(Scanner scanner, int players, int ply, int heuristicChoice){
 		
 		// initialize both move tracking arrays to moves that are impossible.  These will be overwritten in the first 2 turns of the game.
-		secondLastMove = new Move[players];
-		lastMove = new Move[players];
-		for(int i=0; i<secondLastMove.length; i++){
-			secondLastMove[i] = new Move(0,0,0,0,0);
-			lastMove[i] = new Move(0,0,0,0,0);
-		}
+		initializeSavedMoves(players);
 		
 		boolean gameInProgress = true;
 		playerScores = new int[players];
@@ -111,12 +110,7 @@ public class Game {
 	public void runCvC(int players, int ply1, int ply2, int c1HeuristicChoice, int c2HeuristicChoice){
 		
 		// initialize both move tracking arrays to moves that are impossible.  These will be overwritten in the first 2 turns of the game.
-		secondLastMove = new Move[players];
-		lastMove = new Move[players];
-		for(int i=0; i<secondLastMove.length; i++){
-			secondLastMove[i] = new Move(0,0,0,0,0);
-			lastMove[i] = new Move(0,0,0,0,0);
-		}
+		initializeSavedMoves(players);
 		
 		boolean gameInProgress = true;
 		playerScores = new int[players];
@@ -305,7 +299,7 @@ public class Game {
 		return true;
 	}
 	
-	private ArrayList<Move> generateMoves(int currentPlayerToken, Board boardState){
+	public ArrayList<Move> generateMoves(int currentPlayerToken, Board boardState){
 		
 		ArrayList<Move> moves = new ArrayList<Move>();
 		//System.out.println(boardState.toString());
@@ -324,7 +318,7 @@ public class Game {
 						for(int squaresMoved = 1; squaresMoved <= selectedTokens; squaresMoved++){
 							
 							if(boardState.isValidCoord(x-squaresMoved, y)){
-								Move m = new Move(x, y, x-squaresMoved, y, selectedTokens);
+								Move m = new Move(x, y, x-squaresMoved, y, selectedTokens, 4*selectedTokens);
 								if(!m.equals(secondLastMove[currentPlayerToken - 1])){// to avoid deadlock, it is illegal to repeat the second last move
 									moves.add(m);
 								}
@@ -332,21 +326,21 @@ public class Game {
 								//System.out.println("Adding move: "+m.toString());
 							}
 							if(boardState.isValidCoord(x, y-squaresMoved)){
-								Move m = new Move(x, y, x, y-squaresMoved, selectedTokens);
+								Move m = new Move(x, y, x, y-squaresMoved, selectedTokens, 4*selectedTokens+1);
 								if(!m.equals(secondLastMove)){
 									moves.add(m);
 								}
 								//System.out.println("Adding move: "+m.toString());
 							}
 							if(boardState.isValidCoord(x+squaresMoved, y)){
-								Move m = new Move(x, y, x+squaresMoved, y, selectedTokens);
+								Move m = new Move(x, y, x+squaresMoved, y, selectedTokens, 4*selectedTokens+2);
 								if(!m.equals(secondLastMove)){
 									moves.add(m);
 								}
 								//System.out.println("Adding move: "+m.toString());
 							}
 							if(boardState.isValidCoord(x, y+squaresMoved)){
-								Move m = new Move(x, y, x, y+squaresMoved, selectedTokens);
+								Move m = new Move(x, y, x, y+squaresMoved, selectedTokens, 4*selectedTokens+3);
 								if(!m.equals(secondLastMove)){
 									moves.add(m);
 								}
@@ -364,10 +358,76 @@ public class Game {
 	}
 	
 	// method that will generate moves one at a time, based on the last move that was generated
-	//private Move generateMove(Move previous){
+	// necessary to reduce overhead of generating all possible moves when only the first few are searched before a cut is made.
+	public Move generateMove(int currentPlayerToken, Board boardState, Move previous){
 		
+		int stepsToSkip = previous.getGenerationIndex() % 4;
+		int initialDistanceMoved;
+		int initialX = previous.getInitialX();
 		
-	//}
+		if(previous.getInitialX() != previous.getFinalX()){
+			initialDistanceMoved = Math.abs(previous.getInitialX() - previous.getFinalX());
+		} else {
+			initialDistanceMoved = Math.abs(previous.getInitialY() - previous.getFinalY());
+		}
+		
+		//iterate over the board and select each piece which belongs to the current player
+		for(int y=previous.getInitialY(); y<boardState.BOARD_HEIGHT; y++){
+			
+			for(int x=initialX; x<boardState.BOARD_WIDTH; x++){
+				
+				if(boardState.getSquare(x, y).getController() == currentPlayerToken){
+					
+					// any number of tokens from the stack may be moved (1 to the total number of tokens)
+					for(int selectedTokens = previous.getTokensToMove(); selectedTokens <= boardState.getSquare(x, y).getSize(); selectedTokens++){
+						
+						// legal moves are a number of spaces either horizontally or vertically up to the number of pieces removed
+						for(int squaresMoved = initialDistanceMoved; squaresMoved <= selectedTokens; squaresMoved++){
+							
+							// statement 1 generates stepsToSkip == 0
+							if(boardState.isValidCoord(x-squaresMoved, y) && stepsToSkip < 0){ // always skip this step the first time through, as stepsToSkip should always be 0, 1, 2, or 3
+								Move m = new Move(x, y, x-squaresMoved, y, selectedTokens, 0);
+								if(!m.equals(secondLastMove[currentPlayerToken - 1])){// to avoid deadlock, it is illegal to repeat the second last move
+									return m;
+								}
+								
+								//System.out.println("Adding move: "+m.toString());
+							} 
+							// statement 2, generates stepsToSkip == 1
+							if(boardState.isValidCoord(x, y-squaresMoved) && stepsToSkip < 1){ // perform this step the first time through only if the previous move was generated by the first statement 
+								Move m = new Move(x, y, x, y-squaresMoved, selectedTokens, 1);
+								if(!m.equals(secondLastMove)){
+									return m;
+								}
+								//System.out.println("Adding move: "+m.toString());
+							} 
+							// statement 3, generates stepsToSkip == 2
+							if(boardState.isValidCoord(x+squaresMoved, y) && stepsToSkip < 2){
+								Move m = new Move(x, y, x+squaresMoved, y, selectedTokens, 2);
+								if(!m.equals(secondLastMove)){
+									return m;
+								}
+								//System.out.println("Adding move: "+m.toString());
+							} 
+							// statement 4, generates stepsToSkip == 3
+							if(boardState.isValidCoord(x, y+squaresMoved) && stepsToSkip < 3){
+								Move m = new Move(x, y, x, y+squaresMoved, selectedTokens, 3);
+								if(!m.equals(secondLastMove)){
+									return m;
+								}
+								//System.out.println("Adding move: "+m.toString());
+							}
+							stepsToSkip = -1; // once the first iteration has been completed, we want to perform all statements in the following loop iterations
+						}
+						
+					}
+					
+				}
+			}
+			initialX = 0;// need to reset the loop counter here so that it does not start at previous.initialX once the y coordinate is incremented.
+		}
+		return null; // if all of the possibilities have been and no valid move has been found, return null.  Need to check for null in the calling function.
+	}
 	
 	private ArrayList<Board> performAllMoves(Board boardState, ArrayList<Move> moves){
 		

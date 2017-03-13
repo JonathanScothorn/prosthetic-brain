@@ -104,6 +104,9 @@ public class Board {
 		
 	}
 	
+	public void setSquare(int x, int y, Square square){
+		grid[y][x] = square;
+	}
 	
 	public boolean isValidCoord(int x, int y){
 		

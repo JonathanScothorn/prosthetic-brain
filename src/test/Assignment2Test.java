@@ -24,6 +24,7 @@ public class Assignment2Test {
 		board = game.getBoard();
 		square = new Square(1);
 		move = new Move(1,2,5,6,3);
+		game.initializeSavedMoves(2);
 	}
 	
 	@Test
@@ -194,14 +195,7 @@ public class Assignment2Test {
 		assertEquals(initial, board.getSquare(0, 2).toString());
 	}
 	
-	@Test
-	public void gameCalculateHeuristic1() throws Exception{
-		
-		game.performMove(board, new Move(1,1,1,2,1));
-		assertEquals(19, game.calculateHeuristic1(board, board.getSquare(1, 2).getController()));
-		
-	}
-	
+
 	@Test
 	public void gameEvaluateNode() throws Exception{
 		
@@ -213,6 +207,34 @@ public class Assignment2Test {
 	@Test
 	public void gameGenerateMoves() throws Exception{
 		// TODO
+	}
+	
+	@Test
+	public void gameGenerateMove() throws Exception {
+		
+		ArrayList<Move> moves = game.generateMoves(1,board);
+		ArrayList<Move> moves2 = new ArrayList<Move>();
+		
+		Move initial = new Move(0,0,1,0,1,-1);
+		Move next = game.generateMove(1,board,initial);
+		moves2.add(next);
+		
+		while(game.generateMove(1, board, next) != null){
+			next = game.generateMove(1, board, next);
+			moves2.add(next);
+		}
+		/*
+		for(int i=0; i<moves.size(); i++){
+			System.out.println(moves.get(i).toString());
+			System.out.println(moves2.get(i).toString());
+			System.out.println("=============================================================");
+			
+		}*/
+		
+		for(int i=0; i<moves.size(); i++){
+			//System.out.println(i);
+			assertEquals(true, moves.get(i).equals(moves2.get(i)));
+		}
 	}
 	
 	
