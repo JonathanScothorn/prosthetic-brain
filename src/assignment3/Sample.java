@@ -1,10 +1,11 @@
 package assignment3;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Sample {
 
-	private ArrayList<Boolean> features;
+	private ArrayList<Boolean> features; // true is 1, false is 0
 	
 	public Sample(Sample original){
 		
@@ -26,4 +27,11 @@ public class Sample {
 		this.features = features;
 	}
 	
+	
+	@Override
+	public String toString(){
+		
+		return "Sample with features vector: "+Arrays.toString(features.toArray());
+		
+	}
 }
