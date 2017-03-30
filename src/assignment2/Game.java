@@ -26,7 +26,7 @@ public class Game {
 		gameBoard = new Board();
 		initiatorMove = new Move(0,0,1,0,1,-1);
 		
-		System.out.println("Initial Board State: \n");
+		System.out.println("\nInitial Board State: \n");
 		System.out.println(gameBoard.toString());
 		
 	}
@@ -45,6 +45,7 @@ public class Game {
 		
 		System.out.println("Player 1 has captured "+playerScores[0]+" pieces.");
 		System.out.println("Player 2 has captured "+playerScores[1]+" pieces.");
+		System.out.println("===================================================\n");
 	}
 	
 	public void calculateScores(){
@@ -65,6 +66,20 @@ public class Game {
 		playerScores[1] = 18 - p1TokensFound;// player 2's score
 	}
 	
+	public void printWinner(int winner){
+		
+		if(playerScores[0] >= 8 && playerScores[1] >=8){
+			System.out.println("Game Complete.  Tie!");
+		} else if (playerScores[0] >= 8){
+			System.out.println("Game Complete.  Player 1 is victorious!");
+		} else if (playerScores[1] >= 8){
+			System.out.println("Game Complete.  Player 2 is victorious!");
+		} else {
+			System.out.println("Exhaustion Game Completed.  Player "+winner+" is victorious.");
+		}
+		
+	}
+	
 	public void runPvP(Scanner scanner, int players){
 		
 		// initialize both move tracking arrays to moves that are impossible.  These will be overwritten in the first 2 turns of the game.
@@ -75,8 +90,15 @@ public class Game {
 		
 		// game starts with player 1
 		int currentPlayer = 1;
+		int winner = 0;
+		int turn = 1;
 		
 		while(gameInProgress){
+			
+			if(currentPlayer == 1){
+				System.out.println("Turn "+turn+"\n");
+				turn++;
+			}
 			
 			// execute a player's turn
 			gameInProgress = executeHumanTurn(scanner, currentPlayer);
@@ -85,7 +107,7 @@ public class Game {
 			printScores();
 			
 			if(!gameInProgress){
-				System.out.println("Game complete.  Player "+currentPlayer+" is victorious!");
+				winner = currentPlayer;
 			}
 			
 			
@@ -96,6 +118,7 @@ public class Game {
 			}
 			
 		}
+		printWinner(winner);
 		
 		//System.out.println(Arrays.toString(generateMoves(1).toArray()));
 	}
@@ -108,8 +131,15 @@ public class Game {
 		boolean gameInProgress = true;
 		playerScores = new int[players];
 		int currentPlayer = 1;
+		int turn = 1;
+		int winner = 0;
 		
 		while(gameInProgress){
+			
+			if(currentPlayer == 1){
+				System.out.println("Turn "+turn+"\n");
+				turn++;
+			}
 			
 			// player 1 will be the human player, player 2 the computer player
 			if(currentPlayer == 1){
@@ -122,10 +152,9 @@ public class Game {
 			printScores();
 			
 			if(!gameInProgress){
-				System.out.println("Game complete.  Player "+currentPlayer+" is victorious!");
+				winner = currentPlayer;
 			}
-			
-			
+						
 			// increment the player number, and roll over if the maximum number of players has been exceeded
 			currentPlayer++;
 			if(currentPlayer > players){
@@ -133,6 +162,8 @@ public class Game {
 			}
 			
 		}
+		
+		printWinner(winner);
 		
 	}
 	
@@ -144,8 +175,15 @@ public class Game {
 		boolean gameInProgress = true;
 		playerScores = new int[players];
 		int currentPlayer = 1;
+		int winner = 0;
+		int turn = 1;
 		
 		while(gameInProgress){
+			
+			if(currentPlayer == 1){
+				System.out.println("Turn "+turn+"\n");
+				turn++;
+			}
 			
 			if(currentPlayer == 1){
 				gameInProgress = executeComputerTurn(currentPlayer, ply1, c1HeuristicChoice);
@@ -157,7 +195,7 @@ public class Game {
 			printScores();
 			
 			if(!gameInProgress){
-				System.out.println("Game complete.  Player "+currentPlayer+" is victorious!");
+				winner = currentPlayer;
 			}
 			
 			
@@ -169,6 +207,7 @@ public class Game {
 			
 		}
 		
+		printWinner(winner);
 	}
 	
 	private boolean executeComputerTurn(int currentPlayerToken, int ply, int heuristicChoice){
@@ -190,7 +229,7 @@ public class Game {
 		performMove(gameBoard, initial.getBestNextMove());
 		calculateScores();
 		
-		System.out.println("Computer player "+currentPlayerToken+" performs "+initial.getBestNextMove().toString()+" With heuristic value "+initial.getAlphaOrBeta());
+		System.out.println("Computer player "+currentPlayerToken+" performs "+initial.getBestNextMove().toString()+" Heuristic value "+initial.getAlphaOrBeta());
 		
 		if(playerScores[currentPlayerToken - 1] >= 8 || playerScores[getNextPlayerToken(currentPlayerToken) - 1] >= 8){
 			return false;
@@ -539,6 +578,7 @@ public class Game {
 				
 		}
 		heuristicValue += ((18 - opposingPlayerTokensFound) * 50);
+		heuristicValue -= ((18 - currentPlayerTokensFound) * 45);
 		return heuristicValue;
 	}
 	
@@ -546,6 +586,7 @@ public class Game {
 	public int calculateHeuristic2(Board board, int currentPlayerToken){
 		
 		int heuristicValue = 0;
+		int currentPlayerTokensFound = 0;
 		int opposingPlayerTokensFound = 0;
 		int nextPlayerToken = getNextPlayerToken(currentPlayerToken);
 		
@@ -555,12 +596,14 @@ public class Game {
 					if(board.getSquare(x, y).getController() == currentPlayerToken){
 						heuristicValue += board.getSquare(x, y).getSize() * board.getSquare(x, y).getSize();
 					}
+					currentPlayerTokensFound += board.getSquare(x, y).getPiecesByPlayer(currentPlayerToken);
 					opposingPlayerTokensFound += board.getSquare(x, y).getPiecesByPlayer(nextPlayerToken);
 				}
 			}
 				
 		}
 		heuristicValue += ((18 - opposingPlayerTokensFound) * 50);
+		heuristicValue -= ((18 - currentPlayerTokensFound) * 45);
 		return heuristicValue;
 		
 	}
@@ -635,7 +678,8 @@ public class Game {
 		
 		Game game = new Game();
 		
-		int gameType = game.scanInt(scanner, "Please enter '1' for Player vs. Player, '2' for Player vs. Computer, or '3' for Computer vs. Computer.");
+		int gameType = game.scanInt(scanner, "Please enter '1' for Player vs. Player, '2' for Player vs. Computer, "
+				+ "\nor '3' for Computer vs. Computer.");
 		
 		if(gameType == 1){
 			

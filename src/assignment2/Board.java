@@ -15,6 +15,7 @@ public class Board {
 	// initial creation
 	public Board(){
 		
+		System.out.println("Building the board\n");
 		int totalPlayerTokens = (BOARD_HEIGHT-2)*(BOARD_WIDTH-2);
 		grid = new Square[BOARD_HEIGHT][BOARD_WIDTH];
 		
