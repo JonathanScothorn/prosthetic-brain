@@ -1,37 +1,39 @@
 package assignment3;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Sample {
 
-	private ArrayList<Boolean> features; // true is 1, false is 0
+	private Boolean[] features; // true is 1, false is 0
 	
 	public Sample(Sample original){
 		
-		this.features = (ArrayList<Boolean>) original.getFeatures().clone();
+		this.features = original.getFeatures().clone();
 		
 	}
 	
-	public Sample(ArrayList<Boolean> features){
+	public Sample(Boolean[] features){
 		
 		this.features = features;
 		
 	}
 	
-	public ArrayList<Boolean> getFeatures(){
+	public Boolean[] getFeatures(){
 		return this.features;
 	}
 	
-	public void setFeatures(ArrayList<Boolean> features){
+	public void setFeatures(Boolean[] features){
 		this.features = features;
 	}
 	
+	public Boolean getFeature(int index){
+		return this.features[index];
+	}
 	
 	@Override
 	public String toString(){
 		
-		return "Sample with features vector: "+Arrays.toString(features.toArray());
+		return "Sample with features vector: "+Arrays.toString(features);
 		
 	}
 }

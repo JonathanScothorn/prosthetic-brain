@@ -13,7 +13,7 @@ public class DepTreeNode {
 	
 	// constructor exclusively for root node
 	public DepTreeNode(double probability){
-		this(null, probability, 0, 0);
+		this(null, probability, probability, 0); // the root node will always have the same probability since it has no dependence on another node.
 	}
 	
 	public DepTreeNode(DepTreeNode parent, double probability0Given0, double probability0Given1, int nodeNumber){
@@ -46,6 +46,10 @@ public class DepTreeNode {
 	
 	public DepTreeNode getParent() {
 		return parent;
+	}
+	
+	public int getNodeNumber(){
+		return nodeNumber;
 	}
 	
 	public double getProbability0Given0(){
