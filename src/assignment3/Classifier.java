@@ -511,8 +511,13 @@ public class Classifier {
 				
 			} else if(technique == 2){
 			
-				results1 = classifySamplesByDecisionTree(class1TrainingSamples, class2TrainingSamples, class1TestingSamples);
-				results2 = classifySamplesByDecisionTree(class2TrainingSamples, class1TrainingSamples, class2TestingSamples);
+				results1 = classifySamplesByDecisionTree(class1TrainingSamples, class2TrainingSamples, class1TestingSamples, false);
+				results2 = classifySamplesByDecisionTree(class2TrainingSamples, class1TrainingSamples, class2TestingSamples, false);
+				
+			} else if(technique == 3){
+			
+				results1 = classifySamplesByDecisionTree(class1TrainingSamples, class2TrainingSamples, class1TestingSamples, true);
+				results2 = classifySamplesByDecisionTree(class2TrainingSamples, class1TrainingSamples, class2TestingSamples, true);
 				
 			} else {
 				System.out.println("Invalid technique for performNFoldCrossValidation");
@@ -996,7 +1001,7 @@ public class Classifier {
 		}
 	}
 	
-	private double[] classifySamplesByDecisionTree(List<Sample> trainingSamples1, List<Sample> trainingSamples2, List<Sample> testingSamples){
+	private double[] classifySamplesByDecisionTree(List<Sample> trainingSamples1, List<Sample> trainingSamples2, List<Sample> testingSamples, Boolean printTree){
 		
 		if(trainingSamples1.size() == 0 || trainingSamples2.size() == 0){
 			System.out.println("Attempted Decision Tree classification with an empty sample list.");
@@ -1016,7 +1021,8 @@ public class Classifier {
 		
 		// create the decision tree
 		DecTreeNode root = buildNextDecTreeNode(trainingSamples1, trainingSamples2, features, null, true);
-		//printDecisionTree(root);
+		if(printTree)
+			printDecisionTree(root);
 		
 		// now classify the testing samples using the decision tree
 		for(Sample sample: testingSamples){
@@ -1035,9 +1041,10 @@ public class Classifier {
 	
 	private void printDecisionTree(DecTreeNode root){
 		
-		//System.out.println(root.toString());
-		BTreePrinter.printNode(root);
-		/*
+		System.out.println("Decision Tree Generated: ");
+		//System.out.println(root.printAll());
+		//BTreePrinter.printNode(root);
+		
 		PrintStream stdout = System.out;
 		
 		OutputStreamWriter os = null;
@@ -1056,7 +1063,7 @@ public class Classifier {
 				}
 			}
 		}
-		System.setOut(stdout);*/
+		System.setOut(stdout);
 		
 	}
 	
@@ -1191,6 +1198,64 @@ public class Classifier {
 		
 		System.out.println("Independent Classification: "+Arrays.toString(c.independentClassification(samples.subList(0, 10000))));
 	*/	
+		ArrayList<ArrayList<Sample>> inputs = c.extractSampleSets();
+		ArrayList<Sample> class1SamplesRL = inputs.get(0);
+		ArrayList<Sample> class2SamplesRL = inputs.get(1);
+		ArrayList<Sample> class3SamplesRL = inputs.get(2);
+		/*
+		for(Sample s: class1SamplesRL){
+			System.out.println(s.toString());
+		}
+		for(Sample s: class2SamplesRL){
+			System.out.println(s.toString());
+		}
+		for(Sample s: class2SamplesRL){
+			System.out.println(s.toString());
+		}*/
+		
+		System.out.println("Inferred dependency tree from Class 1 Real Life samples.");
+		System.out.println(c.inferDependenceTree(class1SamplesRL).get(0).toString());
+		
+		System.out.println("Inferred dependency tree from Class 2 Real Life samples.");
+		System.out.println(c.inferDependenceTree(class2SamplesRL).get(0).toString());
+		
+		System.out.println("Inferred dependency tree from Class 3 Real Life samples.");
+		System.out.println(c.inferDependenceTree(class3SamplesRL).get(0).toString());
+		
+		System.out.println("=========================================================");
+		
+		System.out.println("Independent Classification of Class 1 and 2 samples: ");
+		c.performNFoldCrossValidation(4, class1SamplesRL, class2SamplesRL, 0);
+		
+		System.out.println("Dependent Classification of Class 1 and 2 samples: ");
+		c.performNFoldCrossValidation(4, class1SamplesRL, class2SamplesRL, 1);
+		
+		System.out.println("Decision Tree Classification of Class 1 and 2 samples: ");
+		c.performNFoldCrossValidation(4, class1SamplesRL, class2SamplesRL, 2);
+		
+		System.out.println("=========================================================");
+		
+		System.out.println("Independent Classification of Class 1 and 3 samples: ");
+		c.performNFoldCrossValidation(5, class1SamplesRL, class3SamplesRL, 0);
+		
+		System.out.println("Dependent Classification of Class 1 and 3 samples: ");
+		c.performNFoldCrossValidation(5, class1SamplesRL, class3SamplesRL, 1);
+		
+		System.out.println("Decision Tree Classification of Class 1 and 3 samples: ");
+		c.performNFoldCrossValidation(5, class1SamplesRL, class3SamplesRL, 2);
+		
+		System.out.println("=========================================================");
+		
+		System.out.println("Independent Classification of Class 2 and 3 samples: ");
+		c.performNFoldCrossValidation(5, class2SamplesRL, class3SamplesRL, 0);
+		
+		System.out.println("Dependent Classification of Class 2 and 3 samples: ");
+		c.performNFoldCrossValidation(5, class2SamplesRL, class3SamplesRL, 1);
+		
+		System.out.println("Decision Tree Classification of Class 2 and 3 samples: ");
+		c.performNFoldCrossValidation(5, class2SamplesRL, class3SamplesRL, 2);
+		
+		
 			
 		int[] treeGenerationClass1 = {2, 1, 3, 0, 0, 0, 1, 2, 0, 0};
 		//double[] treeProbabilitiesGiven0Class1 = {0.2, 0.7, 0.9, 0.5, 0.4, 0.2, 0.1, 0.5, 0.9};
@@ -1312,13 +1377,13 @@ public class Classifier {
 		System.out.println("=========================================================");
 		
 		System.out.println("Independent Classification of Class 3 and 4 samples: ");
-		c.performNFoldCrossValidation(5, class3Samples, class4Samples, 0);
+		c.performNFoldCrossValidation(4, class3Samples, class4Samples, 0);
 		
 		System.out.println("Dependent Classification of Class 3 and 4 samples: ");
-		c.performNFoldCrossValidation(5, class3Samples, class4Samples, 1);
+		c.performNFoldCrossValidation(4, class3Samples, class4Samples, 1);
 		
 		System.out.println("Decision Tree Classification of Class 3 and 4 samples: ");
-		c.performNFoldCrossValidation(5, class3Samples, class4Samples, 2);
+		c.performNFoldCrossValidation(4, class3Samples, class4Samples, 2);
 	
 		System.out.println("=========================================================");
 		
@@ -1328,62 +1393,7 @@ public class Classifier {
 		
 		//System.out.println(Arrays.toString(c.classifySamplesIndependently(class1Samples.subList(0, 1600), class2Samples.subList(0, 1600), class1Samples.subList(1600, 2000))));
 		
-		ArrayList<ArrayList<Sample>> inputs = c.extractSampleSets();
-		ArrayList<Sample> class1SamplesRL = inputs.get(0);
-		ArrayList<Sample> class2SamplesRL = inputs.get(1);
-		ArrayList<Sample> class3SamplesRL = inputs.get(2);
-		/*
-		for(Sample s: class1SamplesRL){
-			System.out.println(s.toString());
-		}
-		for(Sample s: class2SamplesRL){
-			System.out.println(s.toString());
-		}
-		for(Sample s: class2SamplesRL){
-			System.out.println(s.toString());
-		}*/
 		
-		System.out.println("Inferred dependency tree from Class 1 Real Life samples.");
-		System.out.println(c.inferDependenceTree(class1SamplesRL).get(0).toString());
-		
-		System.out.println("Inferred dependency tree from Class 2 Real Life samples.");
-		System.out.println(c.inferDependenceTree(class2SamplesRL).get(0).toString());
-		
-		System.out.println("Inferred dependency tree from Class 3 Real Life samples.");
-		System.out.println(c.inferDependenceTree(class3SamplesRL).get(0).toString());
-		
-		System.out.println("=========================================================");
-		
-		System.out.println("Independent Classification of Class 1 and 2 samples: ");
-		c.performNFoldCrossValidation(5, class1SamplesRL, class2SamplesRL, 0);
-		
-		System.out.println("Dependent Classification of Class 1 and 2 samples: ");
-		c.performNFoldCrossValidation(5, class1SamplesRL, class2SamplesRL, 1);
-		
-		System.out.println("Decision Tree Classification of Class 1 and 2 samples: ");
-		c.performNFoldCrossValidation(5, class1SamplesRL, class2SamplesRL, 2);
-		
-		System.out.println("=========================================================");
-		
-		System.out.println("Independent Classification of Class 1 and 3 samples: ");
-		c.performNFoldCrossValidation(5, class1SamplesRL, class3SamplesRL, 0);
-		
-		System.out.println("Dependent Classification of Class 1 and 3 samples: ");
-		c.performNFoldCrossValidation(5, class1SamplesRL, class3SamplesRL, 1);
-		
-		System.out.println("Decision Tree Classification of Class 1 and 3 samples: ");
-		c.performNFoldCrossValidation(5, class1SamplesRL, class3SamplesRL, 2);
-		
-		System.out.println("=========================================================");
-		
-		System.out.println("Independent Classification of Class 2 and 3 samples: ");
-		c.performNFoldCrossValidation(5, class2SamplesRL, class3SamplesRL, 0);
-		
-		System.out.println("Dependent Classification of Class 2 and 3 samples: ");
-		c.performNFoldCrossValidation(5, class2SamplesRL, class3SamplesRL, 1);
-		
-		System.out.println("Decision Tree Classification of Class 2 and 3 samples: ");
-		c.performNFoldCrossValidation(5, class2SamplesRL, class3SamplesRL, 2);
 	}
 
 }
