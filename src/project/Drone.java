@@ -1,0 +1,126 @@
+package project;
+
+public class Drone extends SimulationObject {
+	
+	private Coordinate destination;
+
+	private double xVelocity;
+	private double yVelocity;
+	private double zVelocity;
+	private double xVelocityMax;
+	private double yVelocityMax;
+	private double zVelocityMax;
+	
+	private double xAcceleration;
+	private double yAcceleration;
+	private double zAcceleration;
+	private double xAccelerationMax;
+	private double yAccelerationMax;
+	private double zAccelerationMax;
+	
+	public Drone(double xVelocityMaximum, double yVelocityMaximum, double zVelocityMaximum, double xAccelerationMaximum,
+			double yAccelerationMaximum, double zAccelerationMaximum, int xDestination, int yDestination, int zDestination){
+		
+		setxVelocityMax(xVelocityMaximum);
+		setyVelocityMax(yVelocityMaximum);
+		setzVelocityMax(yVelocityMaximum);
+		setxAccelerationMax(xAccelerationMaximum);
+		setyAccelerationMax(yAccelerationMaximum);
+		setzAccelerationMax(zAccelerationMaximum);
+		
+		setxVelocity(0);
+		setyVelocity(0);
+		setzVelocity(0);
+		setxAcceleration(0);
+		setyAcceleration(0);
+		setzAcceleration(0);
+		
+		setToken("D");
+		
+		destination = new Coordinate(xDestination, yDestination, zDestination);
+	}
+
+	
+	public double getxVelocity() {
+		return xVelocity;
+	}
+	public void setxVelocity(double xVelocity) {
+		this.xVelocity = xVelocity;
+	}
+	public double getyVelocity() {
+		return yVelocity;
+	}
+	public void setyVelocity(double yVelocity) {
+		this.yVelocity = yVelocity;
+	}
+	public double getzVelocity() {
+		return zVelocity;
+	}
+	public void setzVelocity(double zVelocity) {
+		this.zVelocity = zVelocity;
+	}
+	public double getxVelocityMax() {
+		return xVelocityMax;
+	}
+	public void setxVelocityMax(double xVelocityMax) {
+		this.xVelocityMax = xVelocityMax;
+	}
+	public double getyVelocityMax() {
+		return yVelocityMax;
+	}
+	public void setyVelocityMax(double yVelocityMax) {
+		this.yVelocityMax = yVelocityMax;
+	}
+	public double getzVelocityMax() {
+		return zVelocityMax;
+	}
+	public void setzVelocityMax(double zVelocityMax) {
+		this.zVelocityMax = zVelocityMax;
+	}
+	public double getxAcceleration() {
+		return xAcceleration;
+	}
+	public void setxAcceleration(double xAcceleration) {
+		this.xAcceleration = xAcceleration;
+	}
+	public double getyAcceleration() {
+		return yAcceleration;
+	}
+	public void setyAcceleration(double yAcceleration) {
+		this.yAcceleration = yAcceleration;
+	}
+	public double getzAcceleration() {
+		return zAcceleration;
+	}
+	public void setzAcceleration(double zAcceleration) {
+		this.zAcceleration = zAcceleration;
+	}
+	public double getxAccelerationMax() {
+		return xAccelerationMax;
+	}
+	public void setxAccelerationMax(double xAccelerationMax) {
+		this.xAccelerationMax = xAccelerationMax;
+	}
+	public double getyAccelerationMax() {
+		return yAccelerationMax;
+	}
+	public void setyAccelerationMax(double yAccelerationMax) {
+		this.yAccelerationMax = yAccelerationMax;
+	}
+	public double getzAccelerationMax() {
+		return zAccelerationMax;
+	}
+	public void setzAccelerationMax(double zAccelerationMax) {
+		this.zAccelerationMax = zAccelerationMax;
+	}
+	
+	
+	public Coordinate getDestination() {
+		return destination;
+	}
+
+	public void setDestination(Coordinate destination) {
+		this.destination = destination;
+	}
+	
+}
