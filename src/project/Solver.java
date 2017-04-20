@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class Solver {
 	
-	public static final int MAX_NODES_EXPANDED = 50000;
+	public static final int MAX_NODES_EXPANDED = 20000;
 	
 	public Solver(){
 		
@@ -139,9 +139,9 @@ public class Solver {
 				}
 			}
 		}
-		/*for(Move m: moves){
-			System.out.println(m.toString());
-		}*/
+		for(Move m: moves){
+			//System.out.println(m.toString());
+		}
 		return moves;
 	}
 	
@@ -163,9 +163,30 @@ public class Solver {
 		return next;
 	}
 	
+	private boolean droneIsAtDestination(Model node){
+		
+		Drone drone = node.getDrones().get(node.getLastDroneIndex());
+		if(node.getCoordinates(drone).equals(drone.getDestination())){
+			return true;
+		}
+		return false;
+	}
+	
 	private SolutionTree expandNextNode(SolutionTree tree){
 		
 		Model lastNode = tree.getNode(); // removes the node from the tree
+		//System.out.println("Expanding node with heuristic "+lastNode.getHeuristic());
+		
+		// if the drone that is to be examined is already at its destination, no point evaluating any moves
+		// so only produce a single node with it in the same location, but with the drone index incremented
+		if(droneIsAtDestination(lastNode)){
+			Model nextNode = new Model(lastNode);
+			nextNode.incrementLastDroneIndex();
+			//System.out.println("Drone has reached destination.");
+			tree.addNode(nextNode);
+			return tree;
+		}
+		
 		ArrayList<Move> moves = generateMoves(lastNode, lastNode.getDrones().get(lastNode.getLastDroneIndex()));// generate moves using the next drone
 		
 		for(Move move: moves){
@@ -214,10 +235,11 @@ public class Solver {
 				closedNodes.add(currentNode);
 				currentNode = openTree.peekNode();
 			} else {
+				//System.out.println("Dropping node with heuristic "+currentNode.getHeuristic());
 				openTree.getNode();// drop the node since it is a duplicate
 				currentNode = openTree.peekNode();
 			}
-			if(nodesExpanded%1000 == 0){
+			if(nodesExpanded%1000 == 0 && nodesExpanded != 0){
 				System.out.println(nodesExpanded+" nodes have been searched.");
 			}
 			nodesExpanded++;
@@ -301,7 +323,13 @@ public class Solver {
 			if(!droneFilename.equals("q")){
 				ArrayList<Drone> drones = s.generateDrones(droneFilename);
 				for(Drone d: drones){
-					d.setToken(""+drones.indexOf(d));
+					if(drones.indexOf(d)<10){
+						d.setToken(""+drones.indexOf(d));
+					} else if(drones.indexOf(d)<10+23){
+						d.setToken(""+ (char) (drones.indexOf(d)+55)); // convert the index into a character, from A to W 
+					} else {
+						// too many drones to represent using a single character, default to "D" for the rest
+					}
 				}
 				
 				s.solve(m, drones);

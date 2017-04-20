@@ -36,6 +36,13 @@ public class Coordinate {
 		this.z = z;
 	}
 	
+	public boolean equals(Coordinate c){
+		if(x==c.getX() && y==c.getY() && z==c.getZ()){
+			return true;
+		}
+		return false;
+	}
+	
 	@Override
 	public String toString(){
 		return x+","+y+","+z;

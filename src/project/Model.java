@@ -128,23 +128,9 @@ public class Model {
 	@Override
 	public String toString(){
 		String output = "";
-		/*
-		for(int z=0; z<space.length; z++){
-			output+="Layer "+z+": \n";
-			for(int y=0; y<space[0].length; y++){
-				for(int x=0; x<space[0][0].length; x++){
-					if(space[z][y][x] != null){
-						output+=space[z][y][x].toString();
-					} else {
-						output+="-";
-					}
-				}
-				output+="\n";
-			}
-			output+="\n";
-		}
-		*/
-		
+
+		//output+="heuristic: "+heuristic+"\n";
+		output+="Moving drone "+activeDrones.get(lastDroneIndex).getToken()+"\n";
 		for(int y=0; y<space[0].length; y++){
 			
 			for(int z=0; z<space.length; z++){
@@ -212,6 +198,10 @@ public class Model {
 					}
 				}
 			}
+		}
+		
+		if(lastDroneIndex != m.getLastDroneIndex()){
+			return false;
 		}
 		return true;
 	}
