@@ -2,6 +2,8 @@ package project;
 
 public class Drone extends SimulationObject {
 	
+	private Coordinate arrival;
+	private Coordinate current;
 	private Coordinate destination;
 
 	private double xVelocity;
@@ -18,8 +20,11 @@ public class Drone extends SimulationObject {
 	private double yAccelerationMax;
 	private double zAccelerationMax;
 	
+	private double arrivalTime;
+	
 	public Drone(double xVelocityMaximum, double yVelocityMaximum, double zVelocityMaximum, double xAccelerationMaximum,
-			double yAccelerationMaximum, double zAccelerationMaximum, int xDestination, int yDestination, int zDestination){
+			double yAccelerationMaximum, double zAccelerationMaximum, int xArrival, int yArrival, int zArrival, 
+			int xDestination, int yDestination, int zDestination, double arrivalTime){
 		
 		setxVelocityMax(xVelocityMaximum);
 		setyVelocityMax(yVelocityMaximum);
@@ -37,7 +42,11 @@ public class Drone extends SimulationObject {
 		
 		setToken("D");
 		
+		setArrivalTime(arrivalTime);
+		
 		destination = new Coordinate(xDestination, yDestination, zDestination);
+		setArrival(new Coordinate(xArrival, yArrival, zArrival));
+		current = null;
 	}
 
 	
@@ -122,5 +131,48 @@ public class Drone extends SimulationObject {
 	public void setDestination(Coordinate destination) {
 		this.destination = destination;
 	}
+
+
+	public double getArrivalTime() {
+		return arrivalTime;
+	}
+
+
+	public void setArrivalTime(double arrivalTime) {
+		this.arrivalTime = arrivalTime;
+	}
 	
+	public String printContents(){
+		String output = "";
+		
+		output+="Velocity: "+xVelocity+","+yVelocity+","+zVelocity+"\n";
+		output+="MaxVelocity: "+xVelocityMax+","+yVelocityMax+","+zVelocityMax+"\n";
+		output+="Acceleration: "+xAcceleration+","+yAcceleration+","+zAcceleration+"\n";
+		output+="MaxAcceleration: "+xAccelerationMax+","+yAccelerationMax+","+zAccelerationMax+"\n";
+		output+="Arrival Time: "+arrivalTime+"\n";
+		output+="Arrival Location: "+arrival.toString()+"\n";
+		output+="Destination: "+destination.toString()+"\n";
+		
+		return output;
+	}
+
+
+	public Coordinate getArrival() {
+		return arrival;
+	}
+
+
+	public void setArrival(Coordinate arrival) {
+		this.arrival = arrival;
+	}
+
+
+	public Coordinate getCurrent() {
+		return current;
+	}
+
+
+	public void setCurrent(Coordinate current) {
+		this.current = current;
+	}
 }

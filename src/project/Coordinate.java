@@ -36,4 +36,8 @@ public class Coordinate {
 		this.z = z;
 	}
 	
+	@Override
+	public String toString(){
+		return x+","+y+","+z;
+	}
 }
